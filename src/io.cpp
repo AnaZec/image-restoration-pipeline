@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <exception>
 
 namespace fs = std::filesystem;
 
@@ -21,8 +22,8 @@ std::string outputPath(const std::string& filename) {
     return OUTPUT_DIR + filename;
 }
 
-std::string outputPath(const std::string& folder, const std::string& filename) {
-    return OUTPUT_DIR + folder + "/" + filename;
+std::string outputPath(const std::string& relativeDir, const std::string& filename) {
+    return OUTPUT_DIR + relativeDir + "/" + filename;
 }
 
 cv::Mat loadInputImage(const std::string& filename) {
@@ -36,12 +37,13 @@ cv::Mat loadInputImage(const std::string& filename) {
     return image;
 }
 
-bool ensureOutputFolder(const std::string& folder) {
+bool ensureOutputDir(const std::string& relativeDir) {
     try {
-        fs::create_directories(OUTPUT_DIR + folder);
+        fs::create_directories(OUTPUT_DIR + relativeDir);
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Failed to create folder: " << OUTPUT_DIR + folder
+        std::cerr << "Failed to create output directory: "
+                  << OUTPUT_DIR + relativeDir
                   << " | " << e.what() << '\n';
         return false;
     }
@@ -58,14 +60,14 @@ bool saveOutputImage(const std::string& filename, const cv::Mat& image) {
     return ok;
 }
 
-bool saveOutputImageToFolder(const std::string& folder,
-                             const std::string& filename,
-                             const cv::Mat& image) {
-    if (!ensureOutputFolder(folder)) {
+bool saveOutputImageToDir(const std::string& relativeDir,
+                          const std::string& filename,
+                          const cv::Mat& image) {
+    if (!ensureOutputDir(relativeDir)) {
         return false;
     }
 
-    const std::string path = outputPath(folder, filename);
+    const std::string path = outputPath(relativeDir, filename);
     const bool ok = cv::imwrite(path, image);
 
     if (!ok) {
@@ -88,4 +90,23 @@ bool saveTextFile(const std::string& filename, const std::string& content) {
     return true;
 }
 
+bool saveTextFileToDir(const std::string& relativeDir,
+                       const std::string& filename,
+                       const std::string& content) {
+    if (!ensureOutputDir(relativeDir)) {
+        return false;
+    }
+
+    const std::string path = outputPath(relativeDir, filename);
+    std::ofstream file(path);
+
+    if (!file.is_open()) {
+        std::cerr << "Failed to save text file: " << path << '\n';
+        return false;
+    }
+
+    file << content;
+    return true;
 }
+
+} // namespace io

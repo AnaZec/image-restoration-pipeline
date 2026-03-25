@@ -4,5 +4,7 @@
 #include <opencv2/opencv.hpp>
 
 cv::Mat runPipelineA(const cv::Mat& image);
+cv::Mat runPipelineB(const cv::Mat& image);
+cv::Mat runPipelineC(const cv::Mat& image);
 
 #endif
