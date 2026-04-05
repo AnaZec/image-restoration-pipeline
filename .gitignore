@@ -1,0 +1,16 @@
+build/
+*.o
+*.out
+*.so
+*.a
+*.log
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary
+*.tmp

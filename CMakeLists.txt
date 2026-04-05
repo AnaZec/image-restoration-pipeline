@@ -13,10 +13,16 @@ add_executable(image_pipeline
     src/main.cpp
     src/degradation.cpp
     src/filters.cpp
+    src/manual_filters.cpp
     src/metrics.cpp
     src/pipeline.cpp
     src/io.cpp
     src/timer.cpp
+    src/experiment_registry.cpp
+    src/experiment_runner.cpp
+    src/reporting.cpp
+    src/visualization.cpp
+    
 )
 
 target_link_libraries(image_pipeline ${OpenCV_LIBS})

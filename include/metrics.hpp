@@ -5,5 +5,6 @@
 
 double computeMSE(const cv::Mat& original, const cv::Mat& processed);
 double computePSNR(const cv::Mat& original, const cv::Mat& processed);
+double computeSSIM(const cv::Mat& img1, const cv::Mat& img2);
 
 #endif
