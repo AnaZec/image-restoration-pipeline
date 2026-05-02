@@ -1,16 +1,42 @@
+# Build artifacts
 build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Compiled binaries and object files
 *.o
+*.obj
 *.out
-*.so
 *.a
+*.so
+*.dll
+*.dylib
+*.exe
+image_pipeline
+
+# Generated experiment outputs
+output/
+output_cli_test/
+images/output/
+reports/
+*.csv
+
+# Logs
 *.log
 
 # OS
 .DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
 
-# Temporary
+# Temporary files
 *.tmp
+*.swp
+*.swo
