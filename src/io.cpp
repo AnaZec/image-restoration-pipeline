@@ -26,12 +26,11 @@ std::string outputPath(const std::string& relativeDir, const std::string& filena
     return OUTPUT_DIR + relativeDir + "/" + filename;
 }
 
-cv::Mat loadInputImage(const std::string& filename) {
-    const std::string path = inputPath(filename);
-    cv::Mat image = cv::imread(path, cv::IMREAD_COLOR);
+cv::Mat loadInputImage(const std::string& imagePath) {
+    cv::Mat image = cv::imread(imagePath);
 
     if (image.empty()) {
-        std::cerr << "Failed to load image: " << path << '\n';
+        std::cerr << "Failed to load image: " << imagePath << std::endl;
     }
 
     return image;
