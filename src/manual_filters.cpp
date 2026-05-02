@@ -28,7 +28,7 @@ int reflectIndex(int index, int limit)
     return index;
 }
 
-cv::Mat buildGaussianKernel(int kernelSize, double sigma)
+cv::Mat buildGaussianKernel1D(int kernelSize, double sigma)
 {
     if (kernelSize <= 0 || kernelSize % 2 == 0) {
         throw std::invalid_argument("Gaussian kernel size must be positive and odd");
@@ -38,22 +38,19 @@ cv::Mat buildGaussianKernel(int kernelSize, double sigma)
         throw std::invalid_argument("Gaussian sigma must be > 0");
     }
 
-    cv::Mat kernel(kernelSize, kernelSize, CV_64F);
+    cv::Mat kernel(1, kernelSize, CV_64F);
 
     const int radius = kernelSize / 2;
     const double sigma2 = sigma * sigma;
-    const double coeff = 1.0 / (2.0 * M_PI * sigma2);
 
     double sum = 0.0;
 
-    for (int y = -radius; y <= radius; ++y) {
-        for (int x = -radius; x <= radius; ++x) {
-            const double exponent = -static_cast<double>(x * x + y * y) / (2.0 * sigma2);
-            const double value = coeff * std::exp(exponent);
+    for (int x = -radius; x <= radius; ++x) {
+        const double exponent = -static_cast<double>(x * x) / (2.0 * sigma2);
+        const double value = std::exp(exponent);
 
-            kernel.at<double>(y + radius, x + radius) = value;
-            sum += value;
-        }
+        kernel.at<double>(0, x + radius) = value;
+        sum += value;
     }
 
     kernel /= sum;
@@ -62,27 +59,46 @@ cv::Mat buildGaussianKernel(int kernelSize, double sigma)
 
 cv::Mat applyManualGaussianBlurSingleChannel(const cv::Mat& image, int kernelSize, double sigma)
 {
-    cv::Mat kernel = buildGaussianKernel(kernelSize, sigma);
-    cv::Mat output(image.size(), CV_8U);
+    const cv::Mat kernel = buildGaussianKernel1D(kernelSize, sigma);
 
     const int radius = kernelSize / 2;
 
+    cv::Mat horizontal(image.size(), CV_64F);
+    cv::Mat output(image.size(), CV_8U);
+
+    // First pass: horizontal 1D convolution.
+    for (int row = 0; row < image.rows; ++row) {
+        for (int col = 0; col < image.cols; ++col) {
+            double acc = 0.0;
+
+            for (int kx = -radius; kx <= radius; ++kx) {
+                const int srcCol = reflectIndex(col + kx, image.cols);
+
+                const double pixel =
+                    static_cast<double>(image.at<uchar>(row, srcCol));
+                const double weight =
+                    kernel.at<double>(0, kx + radius);
+
+                acc += pixel * weight;
+            }
+
+            horizontal.at<double>(row, col) = acc;
+        }
+    }
+
+    // Second pass: vertical 1D convolution.
     for (int row = 0; row < image.rows; ++row) {
         for (int col = 0; col < image.cols; ++col) {
             double acc = 0.0;
 
             for (int ky = -radius; ky <= radius; ++ky) {
-                for (int kx = -radius; kx <= radius; ++kx) {
-                    const int srcRow = reflectIndex(row + ky, image.rows);
-                    const int srcCol = reflectIndex(col + kx, image.cols);
+                const int srcRow = reflectIndex(row + ky, image.rows);
 
-                    const double pixel =
-                        static_cast<double>(image.at<uchar>(srcRow, srcCol));
-                    const double weight =
-                        kernel.at<double>(ky + radius, kx + radius);
+                const double pixel = horizontal.at<double>(srcRow, col);
+                const double weight =
+                    kernel.at<double>(0, ky + radius);
 
-                    acc += pixel * weight;
-                }
+                acc += pixel * weight;
             }
 
             output.at<uchar>(row, col) = cv::saturate_cast<uchar>(std::round(acc));
