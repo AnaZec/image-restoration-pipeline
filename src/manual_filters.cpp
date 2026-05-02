@@ -66,16 +66,27 @@ cv::Mat applyManualGaussianBlurSingleChannel(const cv::Mat& image, int kernelSiz
     cv::Mat horizontal(image.size(), CV_32F);
     cv::Mat output(image.size(), CV_8U);
 
+    cv::Mat paddedForHorizontal;
+    cv::copyMakeBorder(
+        image,
+        paddedForHorizontal,
+        0,
+        0,
+        radius,
+        radius,
+        cv::BORDER_REFLECT
+    );
+
     // First pass: horizontal 1D convolution.
     for (int row = 0; row < image.rows; ++row) {
         for (int col = 0; col < image.cols; ++col) {
             float acc = 0.0F;
 
             for (int kx = -radius; kx <= radius; ++kx) {
-                const int srcCol = reflectIndex(col + kx, image.cols);
+                const int paddedCol = col + kx + radius;
 
                 const float pixel =
-                    static_cast<float>(image.at<uchar>(row, srcCol));
+                    static_cast<float>(paddedForHorizontal.at<uchar>(row, paddedCol));
                 const float weight =
                     kernel.at<float>(0, kx + radius);
 
@@ -86,15 +97,26 @@ cv::Mat applyManualGaussianBlurSingleChannel(const cv::Mat& image, int kernelSiz
         }
     }
 
+    cv::Mat paddedForVertical;
+    cv::copyMakeBorder(
+        horizontal,
+        paddedForVertical,
+        radius,
+        radius,
+        0,
+        0,
+        cv::BORDER_REFLECT
+    );
+
     // Second pass: vertical 1D convolution.
     for (int row = 0; row < image.rows; ++row) {
         for (int col = 0; col < image.cols; ++col) {
             float acc = 0.0F;
 
             for (int ky = -radius; ky <= radius; ++ky) {
-                const int srcRow = reflectIndex(row + ky, image.rows);
+                const int paddedRow = row + ky + radius;
 
-                const float pixel = horizontal.at<float>(srcRow, col);
+                const float pixel = paddedForVertical.at<float>(paddedRow, col);
                 const float weight =
                     kernel.at<float>(0, ky + radius);
 
