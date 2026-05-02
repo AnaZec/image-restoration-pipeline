@@ -38,18 +38,18 @@ cv::Mat buildGaussianKernel1D(int kernelSize, double sigma)
         throw std::invalid_argument("Gaussian sigma must be > 0");
     }
 
-    cv::Mat kernel(1, kernelSize, CV_64F);
+    cv::Mat kernel(1, kernelSize, CV_32F);
 
     const int radius = kernelSize / 2;
     const double sigma2 = sigma * sigma;
 
-    double sum = 0.0;
+    float sum = 0.0F;
 
     for (int x = -radius; x <= radius; ++x) {
         const double exponent = -static_cast<double>(x * x) / (2.0 * sigma2);
-        const double value = std::exp(exponent);
+        const float value = static_cast<float>(std::exp(exponent));
 
-        kernel.at<double>(0, x + radius) = value;
+        kernel.at<float>(0, x + radius) = value;
         sum += value;
     }
 
@@ -63,40 +63,40 @@ cv::Mat applyManualGaussianBlurSingleChannel(const cv::Mat& image, int kernelSiz
 
     const int radius = kernelSize / 2;
 
-    cv::Mat horizontal(image.size(), CV_64F);
+    cv::Mat horizontal(image.size(), CV_32F);
     cv::Mat output(image.size(), CV_8U);
 
     // First pass: horizontal 1D convolution.
     for (int row = 0; row < image.rows; ++row) {
         for (int col = 0; col < image.cols; ++col) {
-            double acc = 0.0;
+            float acc = 0.0F;
 
             for (int kx = -radius; kx <= radius; ++kx) {
                 const int srcCol = reflectIndex(col + kx, image.cols);
 
-                const double pixel =
-                    static_cast<double>(image.at<uchar>(row, srcCol));
-                const double weight =
-                    kernel.at<double>(0, kx + radius);
+                const float pixel =
+                    static_cast<float>(image.at<uchar>(row, srcCol));
+                const float weight =
+                    kernel.at<float>(0, kx + radius);
 
                 acc += pixel * weight;
             }
 
-            horizontal.at<double>(row, col) = acc;
+            horizontal.at<float>(row, col) = acc;
         }
     }
 
     // Second pass: vertical 1D convolution.
     for (int row = 0; row < image.rows; ++row) {
         for (int col = 0; col < image.cols; ++col) {
-            double acc = 0.0;
+            float acc = 0.0F;
 
             for (int ky = -radius; ky <= radius; ++ky) {
                 const int srcRow = reflectIndex(row + ky, image.rows);
 
-                const double pixel = horizontal.at<double>(srcRow, col);
-                const double weight =
-                    kernel.at<double>(0, ky + radius);
+                const float pixel = horizontal.at<float>(srcRow, col);
+                const float weight =
+                    kernel.at<float>(0, ky + radius);
 
                 acc += pixel * weight;
             }
