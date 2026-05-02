@@ -82,19 +82,33 @@ The framework reveals several important behaviors:
 Detailed analysis is available in [`docs/results.md`](docs/results.md).
 
 ---
-
 ## Manual vs OpenCV Comparison
 
-Manual implementations of Gaussian and median filters were developed and compared against OpenCV.
+Manual implementations of Gaussian and median filters were developed and compared against OpenCV equivalents.
 
-**Findings:**
-- PSNR and SSIM are nearly identical → correctness validated  
-- OpenCV implementations are **orders of magnitude faster**  
-- Demonstrates the importance of optimized libraries in real systems  
+The goal of the manual implementations is educational and analytical: they show how the algorithms work internally and allow direct comparison against optimized library implementations.
 
-Example:
-- Manual Gaussian: ~2000 ms  
-- OpenCV Gaussian: ~2 ms  
+### Benchmark Summary
+
+Benchmarks were collected over 6 full pipeline runs using:
+
+```bash
+./build/image_pipeline --input images/input/test.jpg --output output
+```
+
+| Variant | Implementation | Average Runtime |
+|---|---|---:|
+| F1 | OpenCV Gaussian | 0.3411 ms |
+| F2 | Manual Gaussian, optimized | 113.7217 ms |
+| G1 | OpenCV Median | 2.5209 ms |
+| G2 | Manual Median | 2228.4269 ms |
+
+### Key Findings
+
+- The optimized manual Gaussian preserves the same output quality metrics while improving the implementation structure.
+- OpenCV remains orders of magnitude faster because it uses low-level optimizations such as SIMD/vectorization, cache-friendly memory access, and highly tuned kernels.
+- Manual median filtering is useful for understanding the algorithm but is not suitable for real-time use in its current form.
+- These results demonstrate the gap between correct algorithm implementation and production-grade optimized image processing.
 
 ---
 
@@ -105,3 +119,4 @@ mkdir build
 cd build
 cmake ..
 make -j
+```
