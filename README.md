@@ -38,6 +38,23 @@ The framework generates side-by-side restoration outputs for each experiment. Th
 
 **Observation:** Sharpening improves edge contrast, but simple spatial filters cannot fully recover information lost through directional motion blur.
 
+## Key Findings
+
+- **Median filtering is highly effective for salt-and-pepper noise.**  
+  In pipeline B3, PSNR improved from `14.1111 dB` to `25.7252 dB`, and SSIM improved from `0.1576` to `0.7127`. This shows why median filtering is well suited for impulse noise: it removes extreme black/white outlier pixels without averaging them into surrounding regions.
+
+- **Motion blur exposes a PSNR/SSIM tradeoff.**  
+  In pipeline E1, PSNR slightly decreased from `26.0381 dB` to `25.9855 dB`, while SSIM improved from `0.7546` to `0.7747`. This shows why PSNR alone is not enough: sharpening may slightly change pixel-level error while still improving perceived structure and edge clarity.
+
+- **Manual Gaussian and OpenCV Gaussian produce nearly identical quality, but very different runtimes.**  
+  OpenCV Gaussian reached `25.9135 dB` PSNR and `0.6394` SSIM, while the optimized manual Gaussian reached `25.9085 dB` PSNR and `0.6398` SSIM. The quality is nearly identical, but the average runtime differs sharply: `0.3411 ms` for OpenCV versus `113.7217 ms` for the manual implementation.
+
+- **Manual median filtering validates the algorithm but is not production-fast.**  
+  OpenCV median filtering reached `25.8633 dB` PSNR and `0.7152` SSIM, while manual median filtering reached `25.8739 dB` PSNR and `0.7151` SSIM. The quality is again nearly identical, but the average runtime gap is large: `2.5209 ms` for OpenCV versus `2228.4269 ms` for the manual implementation.
+
+- **The project demonstrates the difference between algorithmic correctness and production optimization.**  
+  The manual filters confirm understanding of Gaussian and median filtering, while the OpenCV comparisons show why optimized libraries are essential for performance-critical imaging pipelines.
+
 ## Key Features
 
 - Modular pipeline architecture (degradation → restoration → evaluation)
