@@ -110,26 +110,23 @@ The framework reveals several important behaviors:
 Detailed analysis is available in [`docs/results.md`](docs/results.md).
 
 ---
+
 ## Manual vs OpenCV Comparison
 
 Manual implementations of Gaussian and median filters were developed and compared against OpenCV equivalents.
 
 The goal of the manual implementations is educational and analytical: they show how the algorithms work internally and allow direct comparison against optimized library implementations.
 
-### Benchmark Summary
+### Quality and Runtime Comparison
 
-Benchmarks were collected over 6 full pipeline runs using:
+| Filter | Implementation | Final PSNR | Final SSIM | Avg. Runtime |
+|---|---|---:|---:|---:|
+| Gaussian | OpenCV | 25.9135 dB | 0.6394 | 0.3411 ms |
+| Gaussian | Manual optimized | 25.9085 dB | 0.6398 | 113.7217 ms |
+| Median | OpenCV | 25.8633 dB | 0.7152 | 2.5209 ms |
+| Median | Manual | 25.8739 dB | 0.7151 | 2228.4269 ms |
 
-```bash
-./build/image_pipeline --input images/input/test.jpg --output output
-```
-
-| Variant | Implementation | Average Runtime |
-|---|---|---:|
-| F1 | OpenCV Gaussian | 0.3411 ms |
-| F2 | Manual Gaussian, optimized | 113.7217 ms |
-| G1 | OpenCV Median | 2.5209 ms |
-| G2 | Manual Median | 2228.4269 ms |
+The manual implementations produce nearly identical PSNR/SSIM values compared with OpenCV, but OpenCV is dramatically faster. This demonstrates the difference between algorithmic correctness and production-grade optimized image processing.
 
 ### Key Findings
 
