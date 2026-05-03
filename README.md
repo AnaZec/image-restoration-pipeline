@@ -183,11 +183,59 @@ The manual implementations produce nearly identical PSNR/SSIM values compared wi
 
 ---
 
-## Build Instructions
+## Usage
+
+The executable accepts an input image path and an optional output directory.
+
+### Show help
 
 ```bash
-mkdir build
-cd build
-cmake ..
-make -j
+./build/image_pipeline --help
+```
+
+### Run with the default output directory
+
+```bash
+./build/image_pipeline --input images/input/test.jpg
+```
+
+This writes reports, CSV summaries, and generated images to:
+
+```text
+output/
+```
+
+### Run with a custom output directory
+
+```bash
+./build/image_pipeline --input images/input/test.jpg --output results
+```
+
+This writes generated results to:
+
+```text
+results/
+```
+
+### Use short CLI flags
+
+```bash
+./build/image_pipeline -i images/input/test.jpg -o results
+```
+
+### Output structure
+
+A successful run creates a structure similar to:
+
+```text
+output/
+├── output_report.txt
+├── summary.csv
+├── pipelineA/
+├── pipelineB/
+├── pipelineC/
+├── pipelineD/
+├── pipelineE/
+├── pipelineF/
+└── pipelineG/
 ```
