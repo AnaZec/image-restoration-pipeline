@@ -77,6 +77,35 @@ The project is structured as a reusable experimental framework:
 - **reporting** → generates reports and CSV summaries  
 - **visualization** → creates comparison outputs  
 
+```mermaid
+flowchart LR
+    input["Input Image"] --> degradation["Degradation Module"]
+
+    degradation --> pipeline["Restoration Pipeline"]
+
+    pipeline --> stages["Restoration Stages"]
+    stages --> filters["OpenCV Filters"]
+    stages --> manual["Manual Filters"]
+
+    filters --> metrics["Metrics Module"]
+    manual --> metrics
+
+    metrics --> reporting["Reporting Module"]
+    metrics --> visualization["Visualization Module"]
+
+    reporting --> reports["Text Reports + CSV Summary"]
+    visualization --> outputs["Comparison Images"]
+
+    registry["Experiment Registry"] --> runner["Experiment Runner"]
+    runner --> degradation
+    runner --> pipeline
+    runner --> metrics
+    runner --> reporting
+    runner --> visualization
+```
+
+The experiment runner coordinates configured experiments from the registry, applies degradations and restoration stages, evaluates image quality, and produces reports and visual outputs.
+
 See [`docs/architecture.md`](docs/architecture.md) for detailed design.
 
 ---
