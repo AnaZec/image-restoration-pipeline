@@ -10,6 +10,34 @@ The goal is not only to restore images, but to understand **why certain methods 
 
 ---
 
+## Visual Results
+
+The framework generates side-by-side restoration outputs for each experiment. The examples below show the original image, the simulated degradation, and the final restored result.
+
+### Pipeline A2 — Gaussian Noise Restoration
+
+| Original | Degraded | Restored |
+|---|---|---|
+| ![Pipeline A2 original](docs/assets/results/pipelineA_A2/original.jpg) | ![Pipeline A2 degraded Gaussian noise](docs/assets/results/pipelineA_A2/degraded.jpg) | ![Pipeline A2 restored result](docs/assets/results/pipelineA_A2/restored.jpg) |
+
+**Observation:** Gaussian noise is reduced while preserving much of the visible structure. Some smoothing is expected because denoising trades fine detail for noise suppression.
+
+### Pipeline B3 — Salt-and-Pepper Noise Restoration
+
+| Original | Degraded | Restored |
+|---|---|---|
+| ![Pipeline B3 original](docs/assets/results/pipelineB_B3/original.jpg) | ![Pipeline B3 degraded salt-and-pepper noise](docs/assets/results/pipelineB_B3/degraded.jpg) | ![Pipeline B3 restored result](docs/assets/results/pipelineB_B3/restored.jpg) |
+
+**Observation:** Median filtering is especially effective for impulse noise because it removes extreme black/white outlier pixels without averaging them into neighboring regions.
+
+### Pipeline E1 — Motion Blur Restoration
+
+| Original | Degraded | Restored |
+|---|---|---|
+| ![Pipeline E1 original](docs/assets/results/pipelineE_E1/original.jpg) | ![Pipeline E1 degraded motion blur](docs/assets/results/pipelineE_E1/degraded.jpg) | ![Pipeline E1 restored result](docs/assets/results/pipelineE_E1/restored.jpg) |
+
+**Observation:** Sharpening improves edge contrast, but simple spatial filters cannot fully recover information lost through directional motion blur.
+
 ## Key Features
 
 - Modular pipeline architecture (degradation → restoration → evaluation)
